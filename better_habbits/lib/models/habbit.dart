@@ -24,5 +24,4 @@ class Habbit {
     }
     return map;
   }
-
 }

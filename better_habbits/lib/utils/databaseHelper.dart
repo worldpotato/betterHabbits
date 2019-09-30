@@ -82,7 +82,7 @@ class DatabaseHelper {
     }
     return null;
   }
-  
+
 // TODO: delete(int id)
 // TODO: update(Word word)
 }
