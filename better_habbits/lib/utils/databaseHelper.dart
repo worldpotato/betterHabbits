@@ -12,7 +12,7 @@ final String columnName = 'name';
 class DatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
-  static final _databaseName = "MyDatabase.db";
+  static final _databaseName = "betterHabbits.db";
   // Increment this version when you need to change the schema.
   static final _databaseVersion = 1;
 
