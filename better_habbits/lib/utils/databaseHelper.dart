@@ -8,13 +8,14 @@ import 'package:better_habbits/models/habbit.dart';
 final String tableHabbits = 'habbits';
 final String columnId = '_id';
 final String columnName = 'name';
+final String columnCategory = "category";
 
 class DatabaseHelper {
 
   // This is the actual database filename that is saved in the docs directory.
   static final _databaseName = "betterHabbits.db";
   // Increment this version when you need to change the schema.
-  static final _databaseVersion = 1;
+  static final _databaseVersion = 1; // when updating the version also create a upgrade function! For Prototyp, just unistall the app
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -36,15 +37,17 @@ class DatabaseHelper {
     // Open the database. Can also add an onUpdate callback parameter.
     return await openDatabase(path,
         version: _databaseVersion,
-        onCreate: _onCreate);
+        onCreate: _onCreate
+        /*onUpgrade: _onDatabaseUpgrade*/);
   }
 
   // SQL string to create the database
   Future _onCreate(Database db, int version) async {
     await db.execute('''
               CREATE TABLE $tableHabbits (
-                $columnId INTEGER PRIMARY KEY,
-                $columnName TEXT NOT NULL
+                $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+                $columnName TEXT NOT NULL,
+                $columnCategory TEXT                
               )
               ''');
   }
@@ -53,7 +56,12 @@ class DatabaseHelper {
 
   Future<int> insert(Habbit habbit) async {
     Database db = await database;
-    int id = await db.insert(tableHabbits, habbit.toMap());
+    int id;
+    try{
+      id = await db.insert(tableHabbits, habbit.toMapForDb());
+    } on DatabaseException catch (e) {
+      print(e.toString());
+    }
     return id;
   }
 
@@ -82,6 +90,32 @@ class DatabaseHelper {
     }
     return null;
   }
+
+  /* This function is for the case that the current database has a older version
+  * With introducing a new database version it is necessary to create a
+  * Database upgrade function from the older version to the next version.
+  *
+  * To make sure that the migration from a very old version to the current
+  * current version is possible we can use the switch case without breaks.
+   */
+//  _onDatabaseUpgrade(db, oldVersion, newVersion) {
+//
+//    print("Upgrade Database");
+//    switch(oldVersion){
+//      case 1:
+//        _upgradeFromV1toV2(db);
+//        continue v2;
+//        v2:
+//      case 2:
+//    }
+//  }
+
+//  _upgradeFromV1toV2(db){
+//    db.execute('''
+//    ALTER TABLE $tableHabbits
+//    ADD $columnCategory TEXT;
+//    ''');
+//  }
 
 // TODO: delete(int id)
 // TODO: update(Word word)
